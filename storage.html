@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelector('#counter').innerHTML = localStorage.getItem('counter');
+    document.querySelector('button').onclick = () => {
+      let counter = localStorage.getItem('counter');
+      counter++;
+
+      dpcument.querySelector('#counter').innerHTML = counter;
+      localStorage.setItem('counter', counter);
+    }
+  });
+  </script>
+  <body>
+    <h1 id="counter">0</h1>
+    <button>Click Me!</button>
+  </body>
+</html>
