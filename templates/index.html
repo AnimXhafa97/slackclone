@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+
+{% block title %}home{% endblock %}
+
+
+
+{% block body %}
+
+<script src="http://yournodeserver/socket.io/socket.io.js"></script>
+<script src="https://cdn.socket.io/socket.io-1.0.0.js"></script>
+<script type="text/javascript" src="static/script.js"></script>
+
+
+<body id="index">
+
+<div class="sidebar">
+
+</div>
+
+<div id="user_form">
+  <h2>Welcome to RoundTable.io!</h2>
+  <h5>A client-side solution to all your chatroom needs</h5>
+<div class="container">
+  <form>
+      <table>
+        <tr>
+          <td>
+            <label>Create a username to get started: </label>
+            <input id="new_user" type="text" name="username">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <button type="submit" id="save_user">Let's Go!</button>
+          </td>
+        </tr>
+      </table>
+  </form>
+
+
+
+</div>
+</div>
+
+
+
+  <div class="textbox">
+    <textarea rows="8" cols="60" id="user_message" placeholder="Type a message..."></textarea>
+      <button id="post" data-message = "PASSED TEST" type="submit">Post</button>
+  </div>
+
+
+
+<!-- used for testing the socket io implementation -->
+<ul id="messages">
+</ul>
+
+
+
+</body>
+
+{% endblock %}
