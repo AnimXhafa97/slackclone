@@ -4,18 +4,32 @@
 {% block title %}home{% endblock %}
 
 
-
 {% block body %}
 
 <script src="http://yournodeserver/socket.io/socket.io.js"></script>
 <script src="https://cdn.socket.io/socket.io-1.0.0.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script type="text/javascript" src="static/script.js"></script>
 
 
 <body id="index">
 
 <div class="sidebar">
+  <div class="card" id="channel">
+    <table>
+<h4>Channel Name</h4>
 
+      <tr>
+        <td><a class="join">Click to join</a></td>
+      </tr>
+
+      <tr>
+        <td><a class="join">Click to join</a></td>
+      </tr>
+    </table>
+  </div>
+
+  <button type="button" name="button" onclick="newChannel()">New Channel</button>
 </div>
 
 <div id="user_form">

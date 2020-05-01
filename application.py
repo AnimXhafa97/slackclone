@@ -8,6 +8,7 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 socketio = SocketIO(app)
 
+channels = []
 
 @app.route("/")
 def index():
@@ -17,3 +18,7 @@ def index():
 def post(data):
     message = data["message"]
     emit("post message", {"message":message}, broadcast=True)
+
+@socketio.on("enter chat")
+def join():
+    emit("new user", broadcast = True)

@@ -50,12 +50,26 @@ if (localStorage.getItem('name')) {
 socket.on('connect', () => {
 
   //ONLY THE POST BUTTON should work for now. The other buttons will be configured after this functionality is tested
+  //takes whatever is in the textarea and posts it as the inner html of the unordered list
   post = document.querySelector('#post');
+  join = document.querySelectorAll('.join');
+
+  //creates button functionality allowing emitting of message
   post.onclick = () => {
     const message = document.querySelector('#user_message').value
     socket.emit('group message', {"message":message});
+
+//all this does is configure the button
+
   };
+
+for (var i = 0; i < join.length; i++) {
+  join[i].onclick = () => {
+    socket.emit('enter chat')
+  }
+}
 });
+
 
 //client receives information from server
 socket.on('post message', data => {
@@ -65,6 +79,14 @@ socket.on('post message', data => {
   document.querySelector('#messages').append(li);
   document.querySelector('#user_message').value = "";
 });
+
+//alerts the channel that a new user has joined the chat
+socket.on('new user', data => {
+  const li = document.createElement('li');
+  const username = localStorage.getItem('name');
+  li.innerHTML = `${username} has joined the chat`;
+  document.querySelector('#messages').append(li);
+})
 
 })
 
@@ -83,3 +105,19 @@ function saveUser() {
   document.querySelector('#post').style.display = 'block'
   return false
 };
+
+
+//creates a new channel when a specific class of button is clicked
+//this function still needs to SAVE the channels when the page is reloaded
+//consider appending these to a json object and then reading the data server-side to load it
+function newChannel() {
+  var doc = prompt("Enter chat name", "Nameless Chat")
+  if (doc != null) {
+    var channel = document.querySelector('#channel')
+    var clone = channel.cloneNode(true);
+    clone.id = doc;
+    clone.querySelector('h4').innerHTML = doc;
+    channel.parentNode.appendChild(clone);
+    //clone.querySelector('h1').innerHTML = doc;
+  };
+}

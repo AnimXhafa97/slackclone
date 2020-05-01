@@ -48,7 +48,17 @@ html, body {
   width: 20%;
   float: left;
   background-color: white;
-  display: grid;
+}
+
+.card table {
+  text-align: right;
+
+}
+
+.join {
+
+  color: blue;
+  pointer-events: stroke;
 }
 
 
