@@ -22,6 +22,32 @@ html, body {
   box-sizing: border-box;
 }
 
+#index .card {
+  margin-top: 5px;
+}
+
+#index svg {
+
+  float: right;
+  margin-top: 10px;
+  margin-right: 10px;
+  height: 30px;
+  width: 30px;
+  color: green;
+}
+
+#plus {
+  cursor: pointer;
+}
+
+/*a {
+  cursor: pointer;
+}*/
+
+.card {
+  cursor: pointer;
+}
+
 /* Style the submit button */
 #index input[type=submit] {
   width: 100%;
@@ -91,7 +117,17 @@ textarea {
   margin-right: 3px;
 }
 
+#create {
+  cursor: pointer;
+}
 
+.modal-content {
+  overflow-y: scroll;
+}
+
+#index a {
+  cursor: pointer;
+}
 
 #index {
 
@@ -112,4 +148,41 @@ textarea {
 
 #index form {
   margin-top: 25px;
+}
+
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
 }

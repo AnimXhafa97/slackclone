@@ -12,28 +12,23 @@
 <script type="text/javascript" src="static/script.js"></script>
 
 
-<body id="index">
+<body id="index" onload="loadRooms()">
 
 <div class="sidebar">
-  <div class="card" id="channel">
-    <table>
-<h4>Channel Name</h4>
-      <tr>
-        <td><a class="join">Click to join</a></td>
-      </tr>
 
-      <tr>
-        <td><a class="join">Click to join</a></td>
-      </tr>
-    </table>
+
+  <div class="card" id="General" onclick="switchActive(this.id)">
+        <h4>General</h4>
   </div>
 
-  <button type="button" name="button" onclick="newChannel()">New Channel</button>
+
+
+  <button type="button" name="button" id="join">Join a chat</button>
 </div>
 
 <div id="user_form">
   <h2>Welcome to RoundTable.io!</h2>
-  <h5>A client-side solution to all your chatroom needs</h5>
+  <h5>It's like Slack but way more primitive!</h5>
 <div class="container">
   <form>
       <table>
@@ -60,8 +55,34 @@
 
   <div class="textbox">
     <textarea rows="8" cols="60" id="user_message" placeholder="Type a message..."></textarea>
-      <button id="post" data-message = "PASSED TEST" type="submit">Post</button>
+      <button id="post" type="submit">Post</button>
   </div>
+
+<a id="create">
+
+  <svg class="bi bi-plus-circle-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" d="M16 8A8 8 0 110 8a8 8 0 0116 0zM8.5 4a.5.5 0 00-1 0v3.5H4a.5.5 0 000 1h3.5V12a.5.5 0 001 0V8.5H12a.5.5 0 000-1H8.5V4z" clip-rule="evenodd"/>
+  </svg>
+
+</a>
+
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <p>Pick a chat you want to join</p>
+    <table id="modal-table">
+      <tr id="modal-room">
+        <td><a><h3>General</h3></a></td>
+      </tr>
+
+
+    </table>
+
+  </div>
+
+</div>
 
 
 

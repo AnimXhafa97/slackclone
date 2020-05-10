@@ -1,18 +1,12 @@
-//potential problem, the new user function that takes a username should not run every time the page is
-//visited since it can be visited by previous users
 
-//use window.localStorage to store data client-side, such as people's username
-
-//Using localStorage we can store the username in the browser, and only display the form initially if
-//there is nothing in localStorage. This does not allow a user to make multiple accounts, but we can handle that
-//with some additional functionality later.
-
-//NOW:
-
-//Use the singlepage.html approach from the lecture to make the form disappear once it is submitted.
-//Find a way to still test if your new_user was saved in localStorage; may involve removing the form tags :'(
 
 document.addEventListener('DOMContentLoaded', () => {
+
+
+
+//clears everything in localStorage; used for testing purposes
+//localStorage.clear()
+
 
   // //hides the message text area until after the user has submitted a display name
   document.querySelector('textarea').style.display = 'none';
@@ -23,9 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   //localStorage.clear() //included for testing purposes
 
+//initial values when user loads the webpage
+//will let us identify which user is in which chat so we know where to send their messages
+  // privateChat == false;
+  // inChat == false;
 
-//save username function
-//this needs to be improved to automatically hide the form if a username exists in localStorage
+//saves the user's display name in localStorage
 if (localStorage.getItem('name')) {
   document.querySelector('#user_form').style.display = 'none';
   document.querySelector('textarea').style.display = 'block';
@@ -46,47 +43,132 @@ if (localStorage.getItem('name')) {
     return false
   };
 
-//when connected, configure the post button to be able to post messages from the textarea
+//does all this as soon as the browser is connected
 socket.on('connect', () => {
 
-  //ONLY THE POST BUTTON should work for now. The other buttons will be configured after this functionality is tested
-  //takes whatever is in the textarea and posts it as the inner html of the unordered list
+//identifying the buttons
   post = document.querySelector('#post');
-  join = document.querySelectorAll('.join');
 
-  //creates button functionality allowing emitting of message
-  post.onclick = () => {
-    const message = document.querySelector('#user_message').value
-    socket.emit('group message', {"message":message});
 
-//all this does is configure the button
+
+//lets user create new chatrooms
+  create.onclick = () => {
+    var doc = prompt("Create a new chat!", "Name your chat...")
+    var check = document.getElementById(doc)
+    if (check != null) {
+
+      alert('That chat room already exists. Pick another name!')
+      return false //ends the function
+
+    }
+
+    if (doc == null) {
+
+      alert('Cannot create a room with no name...')
+      return false
+
+    }
+
+    var channel = document.querySelector('#General')
+    var clone = channel.cloneNode(true);
+    clone.querySelector('h4').innerHTML = doc;
+    channel.parentNode.appendChild(clone);
+    clone.id = doc;
+    localStorage.setItem(doc, doc)
+    socket.emit('new room', {"room":doc}, {"name":localStorage.getItem("name")})
 
   };
 
-for (var i = 0; i < join.length; i++) {
-  join[i].onclick = () => {
-    socket.emit('enter chat')
+  //modal functionality for joining rooms
+  // Get the modal
+  var modal = document.getElementById("myModal");
+
+  // Get the button that opens the modal
+  var join = document.getElementById("join");
+
+  // Get the <span> element that closes the modal
+  var span = document.getElementsByClassName("close")[0];
+
+  // When the user clicks on the button, open the modal
+  join.onclick = function() {
+    modal.style.display = "block";
+    socket.emit('load all rooms')
   }
-}
+
+  // When the user clicks on <span> (x), close the modal
+  span.onclick = function() {
+    modal.style.display = "none";
+  }
+
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
+
+
+
+
+
+//posts a message
+//we need to save this message in the flask server
+  post.onclick = () => {
+    const message = document.querySelector('#user_message').value;
+    socket.emit('group message', {"message":message});
+  };
+
+
+
+
+
 });
 
+//this isn't working for some reason
+socket.on('room created', data => {
+  alert(`${data.roomslist}`)
+})
 
-//client receives information from server
+socket.on('load successful', data => {
+  const modal_room = document.getElementById('modal-room')
+  const modal_table = document.getElementById('modal-table')
+  const roomslist = `${data.rooms}`
+  //const roomslist2 = ['specific', 'another chat']
+  for (var i = 0; i < roomslist.length; i++) {
+    const clone = modal_room.cloneNode(true)
+    clone.querySelector('h3').innerHTML = roomslist[i]
+    modal_table.parentNode.appendChild(clone)
+  }
+  // const clone = modal_room.cloneNode(true)
+  // clone.querySelector('h3').innerHTML = roomslist
+  // //clone.querySelector('h3').innerHTML = roomslist2
+  // modal_table.parentNode.appendChild(clone)
+
+
+})
+
+//posts message
+//must be configured to post message to a specific channel
 socket.on('post message', data => {
   const li = document.createElement('li');
-  const username = localStorage.getItem('name')
+  const username = localStorage.getItem('name');
   li.innerHTML = `${username}: ${data.message}`;
   document.querySelector('#messages').append(li);
   document.querySelector('#user_message').value = "";
+
+
 });
 
+
+
 //alerts the channel that a new user has joined the chat
+//this should be modified to include which chat the user has joined
 socket.on('new user', data => {
   const li = document.createElement('li');
+
   const username = localStorage.getItem('name');
   li.innerHTML = `${username} has joined the chat`;
   document.querySelector('#messages').append(li);
-})
 
 })
 
@@ -106,18 +188,33 @@ function saveUser() {
   return false
 };
 
+});
 
-//creates a new channel when a specific class of button is clicked
-//this function still needs to SAVE the channels when the page is reloaded
-//consider appending these to a json object and then reading the data server-side to load it
-function newChannel() {
-  var doc = prompt("Enter chat name", "Nameless Chat")
-  if (doc != null) {
-    var channel = document.querySelector('#channel')
-    var clone = channel.cloneNode(true);
-    clone.id = doc;
-    clone.querySelector('h4').innerHTML = doc;
-    channel.parentNode.appendChild(clone);
-    //clone.querySelector('h1').innerHTML = doc;
+function loadRooms() {
+
+  var channel = document.querySelector('#General')
+
+
+  //append all localStorage elements for chatrooms to the allrooms array
+  for (var i = 0; i < localStorage.length; i++) {
+
+    if (localStorage.key(i) != "name" && localStorage.key(i) != "debug") {
+      var clone = channel.cloneNode(true)
+      clone.querySelector('h4').innerHTML = localStorage.getItem(localStorage.key(i));
+      channel.parentNode.appendChild(clone);
+      clone.id = localStorage.key(i);
+      clone.className = "card"
+    };
   };
+};
+
+//lets user switch active chatrooms
+//works for now, but does not remember the active chat
+function switchActive(clicked_id) {
+
+  rooms = document.querySelectorAll(".card")
+  for (var i = 0; i < rooms.length; i++) {
+      rooms[i].classList.remove("active")
+  }
+  document.getElementById(clicked_id).classList.add("active")
 }
