@@ -1,4 +1,5 @@
 import os
+import json
 
 from flask import Flask
 from flask_socketio import SocketIO, emit, join_room, leave_room
@@ -19,10 +20,10 @@ rooms = {
 
 }
 
-roomslist = [['specific'], ['another chat']]
+roomslist = ["General", "specific", "really specific"]
 
 
-@app.route("/")
+@app.route("/", methods = ["GET"])
 def index():
     return render_template("index.html")
 
@@ -43,7 +44,7 @@ def newroom(data):
 
 @socketio.on("load all rooms")
 def loadAll():
-    emit('load successful', {"rooms":[roomslist]})
+    emit('load successful', {"rooms":json.dumps(roomslist)})
 
 @socketio.on("join")
 def join():

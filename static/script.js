@@ -129,21 +129,26 @@ socket.on('room created', data => {
   alert(`${data.roomslist}`)
 })
 
+
+//there has to be a better way....
 socket.on('load successful', data => {
-  const modal_room = document.getElementById('modal-room')
-  const modal_table = document.getElementById('modal-table')
-  const roomslist = `${data.rooms}`
-  //const roomslist2 = ['specific', 'another chat']
+  //maybe add something that just clears the current list? Tricky considering I have to modify const clone before it's called...
+  var modal_room = document.getElementById('modal-room')
+  var modal_table = document.getElementById('modal-table')
+  const roomslist = JSON.parse(`${data.rooms}`)
+  //alert(modal_table.childNodes.length)
+//removes all children of the modal table. Element is repopulated with the for loop
+while (true) {
+  
+}
+
+
   for (var i = 0; i < roomslist.length; i++) {
     const clone = modal_room.cloneNode(true)
     clone.querySelector('h3').innerHTML = roomslist[i]
+    clone.className = "modal-row"
     modal_table.parentNode.appendChild(clone)
   }
-  // const clone = modal_room.cloneNode(true)
-  // clone.querySelector('h3').innerHTML = roomslist
-  // //clone.querySelector('h3').innerHTML = roomslist2
-  // modal_table.parentNode.appendChild(clone)
-
 
 })
 
