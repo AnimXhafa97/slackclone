@@ -5,6 +5,8 @@ from flask import Flask
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask import Flask, session, render_template, request, redirect, url_for, g
 
+
+
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 socketio = SocketIO(app)
@@ -20,12 +22,10 @@ rooms = {
 
 }
 
-roomslist = ["General", "specific", "really specific"]
+roomslist = []
 
 
-@app.route("/", methods = ["GET"])
-def index():
-    return render_template("index.html")
+
 
 #send message to the general chat
 @socketio.on("group message")
@@ -35,16 +35,22 @@ def post(data):
     emit("post message", {"message":message}, broadcast=True)
 
 @socketio.on("new room")
-def newroom(data):
+def new_room(data):
     user = data["name"]
     rooms[data["room"]] = []
     roomslist.append(data["room"])
-    join_room(rooms[data["room"]])
-    emit('room created', {"rooms":[roomslist]})
+    #emit('add room', {"roomslist":roomslist})
+    emit('test emit', {"test":roomslist[0]})
 
+    #join_room(rooms[data["room"]])
+
+#this problem was solved more efficiently with Jinja, so this code is no longer necessary
+#was it tho.....
+#it wasn't
 @socketio.on("load all rooms")
 def loadAll():
-    emit('load successful', {"rooms":json.dumps(roomslist)})
+    pass
+
 
 @socketio.on("join")
 def join():
@@ -54,3 +60,7 @@ def join():
 @socketio.on("leave")
 def leave():
     pass
+
+@app.route("/")
+def index():
+    return render_template("index.html", rooms = roomslist)

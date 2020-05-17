@@ -71,11 +71,22 @@
   <!-- Modal content -->
   <div class="modal-content">
     <span class="close">&times;</span>
-    <p>Pick a chat you want to join</p>
+    <h3>Pick a chat you want to join</h3>
     <table id="modal-table">
-      <tr id="modal-room" class="modal-row">
-        <td><a><h3></h3></a></td>
+
+      <!-- {% for i in range(rooms|length) %}
+
+      <tr id="modal-room{{i}}" class="modal-row">
+        <td>{{ rooms[i] }}</td>
       </tr>
+
+      {% endfor %} -->
+      
+      <tr id="modal-room" class="modal-row">
+        <td>General</td>
+      </tr>
+
+
     </table>
 
   </div>

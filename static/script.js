@@ -7,28 +7,21 @@ document.addEventListener('DOMContentLoaded', () => {
 //clears everything in localStorage; used for testing purposes
 //localStorage.clear()
 
-
   // //hides the message text area until after the user has submitted a display name
   document.querySelector('textarea').style.display = 'none';
   document.querySelector('#post').style.display = 'none';
 
 //connects socket.io from the flask app once the doc loads
-  var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
-  //localStorage.clear() //included for testing purposes
-
-//initial values when user loads the webpage
-//will let us identify which user is in which chat so we know where to send their messages
-  // privateChat == false;
-  // inChat == false;
-
-//saves the user's display name in localStorage
+//displays or hides DOM elements if user has submitted a display name or not
 if (localStorage.getItem('name')) {
   document.querySelector('#user_form').style.display = 'none';
   document.querySelector('textarea').style.display = 'block';
   document.querySelector('#post').style.display = 'block';
 };
 
+//saves the user's display name in localStorage
   document.querySelector("#save_user").onclick = () => {
 
     if (!localStorage.getItem('name')) {
@@ -36,48 +29,12 @@ if (localStorage.getItem('name')) {
       localStorage.setItem('name', new_user.value);
     }
     var name = localStorage.getItem('name');
-    //document.querySelector('#test').innerHTML = localStorage.getItem('name');
     document.getElementById('user_form').style.display = "none";
     document.querySelector('textarea').style.display = 'block'
     document.querySelector('#post').style.display = 'block'
     return false
   };
 
-//does all this as soon as the browser is connected
-socket.on('connect', () => {
-
-//identifying the buttons
-  post = document.querySelector('#post');
-
-
-
-//lets user create new chatrooms
-  create.onclick = () => {
-    var doc = prompt("Create a new chat!", "Name your chat...")
-    var check = document.getElementById(doc)
-    if (check != null) {
-
-      alert('That chat room already exists. Pick another name!')
-      return false //ends the function
-
-    }
-
-    if (doc == null) {
-
-      alert('Cannot create a room with no name...')
-      return false
-
-    }
-
-    var channel = document.querySelector('#General')
-    var clone = channel.cloneNode(true);
-    clone.querySelector('h4').innerHTML = doc;
-    channel.parentNode.appendChild(clone);
-    clone.id = doc;
-    localStorage.setItem(doc, doc)
-    socket.emit('new room', {"room":doc}, {"name":localStorage.getItem("name")})
-
-  };
 
   //modal functionality for joining rooms
   // Get the modal
@@ -92,7 +49,6 @@ socket.on('connect', () => {
   // When the user clicks on the button, open the modal
   join.onclick = function() {
     modal.style.display = "block";
-    socket.emit('load all rooms')
   }
 
   // When the user clicks on <span> (x), close the modal
@@ -109,6 +65,48 @@ socket.on('connect', () => {
 
 
 
+//does all this as soon as the browser is connected
+socket.on('connect', () => {
+
+//declaring the buttons
+  post = document.querySelector('#post');
+
+//lets user create new chatrooms and appends them to the sidebar
+  create.onclick = () => {
+    var doc = prompt("Create a new chat!", "Name your chat...")
+    var check = document.getElementById(doc)
+    //handles duplicate room names
+    if (check != null) {
+
+      alert('That chat room already exists. Pick another name!')
+      return false //ends the function
+
+    }
+
+    //handles null room name
+    if (doc.length == 0) {
+
+      alert('Cannot create a room with no name...')
+      return false
+
+    }
+
+    //handles case where user clicks cancel on prompt
+    if (doc == null) {
+      return false
+    }
+
+    //creates the clone
+    //for some reason the emit here doesn't work
+    var channel = document.querySelector('#General')
+    var clone = channel.cloneNode(true);
+    clone.querySelector('h4').innerHTML = doc;
+    channel.parentNode.appendChild(clone);
+    clone.id = doc;
+    localStorage.setItem(doc, doc)
+    socket.emit('new room', {"room":doc})
+
+  };
 
 
 //posts a message
@@ -120,63 +118,37 @@ socket.on('connect', () => {
 
 
 
+//socket.on instances here ________________________________________
+
+//posts messages
+//does not yet post to a specific channel
+  socket.on('post message', data => {
+    const li = document.createElement('li');
+    const username = localStorage.getItem('name');
+    li.innerHTML = `${username}: ${data.message}`;
+    document.querySelector('#messages').append(li);
+    document.querySelector('#user_message').value = "";
 
 
-});
-
-//this isn't working for some reason
-socket.on('room created', data => {
-  alert(`${data.roomslist}`)
-})
+  });
 
 
-//there has to be a better way....
-socket.on('load successful', data => {
-  //maybe add something that just clears the current list? Tricky considering I have to modify const clone before it's called...
-  var modal_room = document.getElementById('modal-room')
-  var modal_table = document.getElementById('modal-table')
-  const roomslist = JSON.parse(`${data.rooms}`)
-  //alert(modal_table.childNodes.length)
-//removes all children of the modal table. Element is repopulated with the for loop
-while (true) {
-  
-}
+//new user has joined chat
+//useless right now
+  socket.on('new user', data => {
+    const li = document.createElement('li');
+    const username = localStorage.getItem('name');
+    li.innerHTML = `${username} has joined the chat`;
+    document.querySelector('#messages').append(li);
 
+  })
 
-  for (var i = 0; i < roomslist.length; i++) {
-    const clone = modal_room.cloneNode(true)
-    clone.querySelector('h3').innerHTML = roomslist[i]
-    clone.className = "modal-row"
-    modal_table.parentNode.appendChild(clone)
-  }
-
-})
-
-//posts message
-//must be configured to post message to a specific channel
-socket.on('post message', data => {
-  const li = document.createElement('li');
-  const username = localStorage.getItem('name');
-  li.innerHTML = `${username}: ${data.message}`;
-  document.querySelector('#messages').append(li);
-  document.querySelector('#user_message').value = "";
 
 
 });
 
 
-
-//alerts the channel that a new user has joined the chat
-//this should be modified to include which chat the user has joined
-socket.on('new user', data => {
-  const li = document.createElement('li');
-
-  const username = localStorage.getItem('name');
-  li.innerHTML = `${username} has joined the chat`;
-  document.querySelector('#messages').append(li);
-
-})
-
+//functions here
 
 //function executes on click once user has submitted display name, saves the name in local storage
 function saveUser() {
@@ -195,14 +167,11 @@ function saveUser() {
 
 });
 
+//loads all the current chatrooms from the user's localStorage to the user's sidebar
 function loadRooms() {
 
   var channel = document.querySelector('#General')
-
-
-  //append all localStorage elements for chatrooms to the allrooms array
   for (var i = 0; i < localStorage.length; i++) {
-
     if (localStorage.key(i) != "name" && localStorage.key(i) != "debug") {
       var clone = channel.cloneNode(true)
       clone.querySelector('h4').innerHTML = localStorage.getItem(localStorage.key(i));
@@ -213,10 +182,8 @@ function loadRooms() {
   };
 };
 
-//lets user switch active chatrooms
-//works for now, but does not remember the active chat
+//switches chatroom class name to active
 function switchActive(clicked_id) {
-
   rooms = document.querySelectorAll(".card")
   for (var i = 0; i < rooms.length; i++) {
       rooms[i].classList.remove("active")
