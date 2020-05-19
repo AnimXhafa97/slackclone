@@ -11,14 +11,9 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 socketio = SocketIO(app)
 
-#dictionary holds channel names and messages in each room. Load this up to 100
-#since the channel names are held in local storage (and specific to each user), this will hold MESSAGES
-#experiment with using a nested dictionary
-#why do we need a nested dictionary when every message has the username next to it? Just save the message as is...
 rooms = {
 
-"general":[],
-"test room":[]
+"General":[]
 
 }
 
@@ -27,35 +22,34 @@ roomslist = []
 
 
 
-#send message to the general chat
+#send message to the active chat
 @socketio.on("group message")
 def post(data):
     message = data["message"]
-    rooms["general"].append(message)
-    emit("post message", {"message":message}, broadcast=True)
+    active_room = data["room"]
+    rooms[active_room].append(message)
+    emit("post message", {"message":message}, broadcast = True)
+
 
 @socketio.on("new room")
 def new_room(data):
-    user = data["name"]
-    rooms[data["room"]] = []
-    roomslist.append(data["room"])
+    # user = data["name"]
+    new_room = data["room"]
+    rooms[new_room] = []
+    roomslist.append(new_room)
     #emit('add room', {"roomslist":roomslist})
-    emit('test emit', {"test":roomslist[0]})
+    emit('creation successful')
+    #emit('test', {"test":rooms})
 
-    #join_room(rooms[data["room"]])
-
-#this problem was solved more efficiently with Jinja, so this code is no longer necessary
-#was it tho.....
-#it wasn't
-@socketio.on("load all rooms")
-def loadAll():
+#lets test the jinja again...
+#jinja2 for loop is working for now, albeit slow; I might revisit this after I finish other functions
+@socketio.on('available rooms')
+def available():
     pass
-
 
 @socketio.on("join")
 def join():
     pass
-
 
 @socketio.on("leave")
 def leave():

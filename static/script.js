@@ -2,7 +2,8 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-
+var private_chat = false
+var in_room = false
 
 //clears everything in localStorage; used for testing purposes
 //localStorage.clear()
@@ -49,6 +50,7 @@ if (localStorage.getItem('name')) {
   // When the user clicks on the button, open the modal
   join.onclick = function() {
     modal.style.display = "block";
+    socket.emit('available rooms')
   }
 
   // When the user clicks on <span> (x), close the modal
@@ -97,7 +99,6 @@ socket.on('connect', () => {
     }
 
     //creates the clone
-    //for some reason the emit here doesn't work
     var channel = document.querySelector('#General')
     var clone = channel.cloneNode(true);
     clone.querySelector('h4').innerHTML = doc;
@@ -108,12 +109,23 @@ socket.on('connect', () => {
 
   };
 
+//inefficient: reloads the page so the jinja2 for loop will work on index.html
+  socket.on('creation successful', data => {
+    location.reload()
+  })
+
+//used to test outputs of sockets
+// socket.on('test', data => {
+//   console.log(`${data.test}`);
+// })
 
 //posts a message
 //we need to save this message in the flask server
   post.onclick = () => {
-    const message = document.querySelector('#user_message').value;
-    socket.emit('group message', {"message":message});
+    var message = document.querySelector('#user_message').value;
+    var room = document.querySelector('.active').id
+    //var some_data = {'message':message, 'room':room}
+    socket.emit('general message', {'message':message, 'room':room});
   };
 
 

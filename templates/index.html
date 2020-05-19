@@ -74,17 +74,17 @@
     <h3>Pick a chat you want to join</h3>
     <table id="modal-table">
 
-      <!-- {% for i in range(rooms|length) %}
+      {% for i in range(rooms|length) %}
 
       <tr id="modal-room{{i}}" class="modal-row">
-        <td>{{ rooms[i] }}</td>
+        <a><td>{{ rooms[i] }}</td></a>
       </tr>
 
-      {% endfor %} -->
-      
-      <tr id="modal-room" class="modal-row">
+      {% endfor %}
+
+      <!-- <tr id="modal-room" class="modal-row">
         <td>General</td>
-      </tr>
+      </tr> -->
 
 
     </table>
