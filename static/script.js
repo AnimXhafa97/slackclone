@@ -2,9 +2,6 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-var private_chat = false
-var in_room = false
-
 //clears everything in localStorage; used for testing purposes
 //localStorage.clear()
 
@@ -85,15 +82,7 @@ socket.on('connect', () => {
 
     }
 
-    //handles null room name
-    if (doc.length == 0) {
-
-      alert('Cannot create a room with no name...')
-      return false
-
-    }
-
-    //handles case where user clicks cancel on prompt
+    //handles nulls
     if (doc == null) {
       return false
     }
@@ -105,27 +94,28 @@ socket.on('connect', () => {
     channel.parentNode.appendChild(clone);
     clone.id = doc;
     localStorage.setItem(doc, doc)
-    socket.emit('new room', {"room":doc})
+    socket.emit('new room', {"room":doc}) //saves the room name serverside
 
   };
 
 //inefficient: reloads the page so the jinja2 for loop will work on index.html
+//i need to find a better way for this to work...
   socket.on('creation successful', data => {
     location.reload()
   })
 
-//used to test outputs of sockets
-// socket.on('test', data => {
-//   console.log(`${data.test}`);
-// })
 
-//posts a message
-//we need to save this message in the flask server
+//post message to the active room
   post.onclick = () => {
     var message = document.querySelector('#user_message').value;
     var room = document.querySelector('.active').id
-    //var some_data = {'message':message, 'room':room}
-    socket.emit('general message', {'message':message, 'room':room});
+    if (room == "General") {
+      socket.emit('send to general', {"message":message})
+    }
+    else if (room !== "General") {
+      socket.emit('send to room', {"room":room});
+    }
+
   };
 
 
@@ -140,7 +130,6 @@ socket.on('connect', () => {
     li.innerHTML = `${username}: ${data.message}`;
     document.querySelector('#messages').append(li);
     document.querySelector('#user_message').value = "";
-
 
   });
 
