@@ -11,8 +11,8 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 socketio = SocketIO(app)
 
-if __name__ == '__main__':
-    socketio.run(app)
+# if __name__ == '__main__':
+#     socketio.run(app)
 
 rooms = {
 
@@ -33,10 +33,10 @@ def post(data):
 
 @socketio.on('send to room')
 def send_to_room(data):
-    #message = data["message"]
+    message = data["message"]
     rooms[data["room"]] = []
-    roomslist.append(str(data["rooms"]))
-    emit("post message", {"message":"PASSED"})
+    roomslist.append((data["rooms"]))
+    emit("post message", {"message":message})
     #emit('test')
 
 #saves the room name from the client side creation

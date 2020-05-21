@@ -67,6 +67,17 @@ if (localStorage.getItem('name')) {
 //does all this as soon as the browser is connected
 socket.on('connect', () => {
 
+//load the current chatrooms from localStorage
+  var channel = document.querySelector('#General')
+  for (var i = 0; i < localStorage.length; i++) {
+    if (localStorage.key(i) != "name" && localStorage.key(i) != "debug") {
+      var clone = channel.cloneNode(true)
+      clone.querySelector('h4').innerHTML = localStorage.getItem(localStorage.key(i));
+      channel.parentNode.appendChild(clone);
+      clone.id = localStorage.key(i);
+      clone.className = "card"
+
+
 //declaring the buttons
   post = document.querySelector('#post');
 
@@ -113,13 +124,10 @@ socket.on('connect', () => {
       socket.emit('send to general', {"message":message})
     }
     else if (room !== "General") {
-      socket.emit('send to room', {"room":room});
+      socket.emit('send to room', {"message":message}, {"room":room});
     }
 
-  };
-
-
-
+  }
 //socket.on instances here ________________________________________
 
 //posts messages
@@ -146,7 +154,7 @@ socket.on('connect', () => {
 
 
 
-});
+};
 
 
 //functions here
@@ -166,22 +174,13 @@ function saveUser() {
   return false
 };
 
-});
 
 //loads all the current chatrooms from the user's localStorage to the user's sidebar
-function loadRooms() {
-
-  var channel = document.querySelector('#General')
-  for (var i = 0; i < localStorage.length; i++) {
-    if (localStorage.key(i) != "name" && localStorage.key(i) != "debug") {
-      var clone = channel.cloneNode(true)
-      clone.querySelector('h4').innerHTML = localStorage.getItem(localStorage.key(i));
-      channel.parentNode.appendChild(clone);
-      clone.id = localStorage.key(i);
-      clone.className = "card"
-    };
-  };
-};
+// function loadRooms() {
+//
+//     };
+//   };
+// };
 
 //switches chatroom class name to active
 function switchActive(clicked_id) {
@@ -190,4 +189,4 @@ function switchActive(clicked_id) {
       rooms[i].classList.remove("active")
   }
   document.getElementById(clicked_id).classList.add("active")
-}
+}}))
