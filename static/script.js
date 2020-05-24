@@ -124,10 +124,11 @@ socket.on('connect', () => {
       socket.emit('send to general', {"message":message})
     }
     else if (room !== "General") {
-      socket.emit('send to room', {"message":message}, {"room":room});
+      socket.emit('send to room', {"message":message, "room":room});
     }
 
   }
+
 //socket.on instances here ________________________________________
 
 //posts messages
@@ -154,8 +155,8 @@ socket.on('connect', () => {
 
 
 
-};
-
+}}});
+})
 
 //functions here
 
@@ -175,18 +176,12 @@ function saveUser() {
 };
 
 
-//loads all the current chatrooms from the user's localStorage to the user's sidebar
-// function loadRooms() {
-//
-//     };
-//   };
-// };
-
 //switches chatroom class name to active
 function switchActive(clicked_id) {
+
   rooms = document.querySelectorAll(".card")
   for (var i = 0; i < rooms.length; i++) {
       rooms[i].classList.remove("active")
   }
   document.getElementById(clicked_id).classList.add("active")
-}}))
+}
